@@ -1,0 +1,17 @@
+{
+  "indentWidth": 4,
+  "useTabs": true,
+  "typescript": {
+    "lineWidth": 100,
+    "preferSingleLine": true,
+    "arrowFunction.useParentheses": "force",
+    "quoteProps": "asNeeded"
+  },
+  "json": {},
+  "includes": ["src/**/*.{ts,tsx,js,jsx,json,astro}", "./*.{ts,tsx,js,jsx,json,astro}"],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.88.1.wasm",
+    "https://plugins.dprint.dev/json-0.17.4.wasm",
+    "https://plugins.dprint.dev/g-plane/markup_fmt-v0.6.0.wasm"
+  ]
+}
