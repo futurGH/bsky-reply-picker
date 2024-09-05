@@ -37,7 +37,7 @@ function App() {
 						+ encodeURIComponent(uri) + "&depth=1",
 				).then((res) => res.json()).then((data) => data.thread);
 				replies = thread?.replies;
-			} catch (e) {
+			} catch {
 				setError("Failed to get replies.");
 				return;
 			}
@@ -46,6 +46,8 @@ function App() {
 				setError("Failed to get replies.");
 				return;
 			}
+
+			const likes = mustLike ? await getAllLikes(thread.post.uri) : [];
 
 			let selected: string | undefined;
 			while (!selected && replies.length > 0) {
@@ -68,10 +70,7 @@ function App() {
 					if (!following) continue;
 				}
 
-				if (mustLike) {
-					const likes = await getAllLikes(thread.post.uri, thread.post.cid);
-					if (!likes.includes(authorDid)) continue;
-				}
+				if (mustLike && !likes.includes(authorDid)) continue;
 
 				selected = replyUri;
 			}
@@ -175,7 +174,7 @@ async function resolveHandle(handle: string): Promise<string> {
 		return await fetch(
 			"https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=" + handle,
 		).then((res) => res.json()).then((data) => data.did);
-	} catch (e) {
+	} catch () {
 		throw new Error("Failed to resolve handle.");
 	}
 }
@@ -192,12 +191,12 @@ function atUriToBskyUri(uri: string): string {
 	return `https://bsky.app/profile/${did}/post/${rkey}`;
 }
 
-async function getAllLikes(uri: string, cid: string): Promise<string[]> {
+async function getAllLikes(uri: string): Promise<string[]> {
 	let cursor = "";
 	let likes: string[] = [];
 	while (true) {
 		const data = await fetch(
-			`https://public.api.bsky.app/xrpc/app.bsky.feed.getLikes?uri=${uri}&cid=${cid}&&cursor=${cursor}`,
+			`https://public.api.bsky.app/xrpc/app.bsky.feed.getLikes?uri=${uri}&cursor=${cursor}`,
 		).then((res) => res.json());
 		likes = likes.concat(data.likes.map((like: any) => like.actor.did));
 		if (!data.cursor) break;
